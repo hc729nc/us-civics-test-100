@@ -398,10 +398,17 @@ function checkAnswer(qIndex) {
 
   let isCorrect = false;
 
+  function closeEnough(user, ans) {
+    if (user === ans) return true;
+    if (user.includes(ans)) return true;
+    if (ans.includes(user) && user.length >= ans.length * 0.5) return true;
+    return false;
+  }
+
   // Check direct answers
   if (data.answers && data.answers.length > 0) {
     for (const ans of data.answers) {
-      if (userAnswer === normalize(ans) || normalize(ans).includes(userAnswer) || userAnswer.includes(normalize(ans))) {
+      if (closeEnough(userAnswer, normalize(ans))) {
         isCorrect = true;
         break;
       }
