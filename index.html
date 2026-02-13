@@ -230,6 +230,7 @@
   <button class="btn-check" onclick="checkAll()">Check All Answers</button>
   <button class="btn-reset" onclick="resetAll()">Reset All</button>
   <button class="btn-shuffle" onclick="shuffleQuestions()">Shuffle Order</button>
+  <button class="btn-reset" onclick="resetOrder()">Reset Order</button>
   <button class="btn-mode" id="modeBtn" onclick="toggleMode()">Single Question Mode</button>
   <div class="scoreboard" id="scoreboard">
     <span class="correct" id="scoreCorrect">0</span> /
@@ -363,6 +364,7 @@ const questionsData = [
 
 let currentIndex = 0;
 let singleModeActive = false;
+let isShuffled = false;
 let displayOrder = questionsData.map((_, i) => i);
 
 function normalize(str) {
@@ -475,7 +477,7 @@ function renderAllQuestions() {
 
   for (let i = 0; i < displayOrder.length; i++) {
     const data = questionsData[displayOrder[i]];
-    if (data.category !== lastCategory) {
+    if (!isShuffled && data.category !== lastCategory) {
       lastCategory = data.category;
       html += '<div class="section-divider">' + escapeHtml(data.category) + '</div>';
     }
@@ -642,10 +644,23 @@ function prevQuestion() {
 }
 
 function shuffleQuestions() {
+  isShuffled = true;
   for (let i = displayOrder.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [displayOrder[i], displayOrder[j]] = [displayOrder[j], displayOrder[i]];
   }
+  resetAll();
+  if (singleModeActive) {
+    currentIndex = 0;
+    renderSingleQuestion();
+  } else {
+    renderAllQuestions();
+  }
+}
+
+function resetOrder() {
+  isShuffled = false;
+  displayOrder = questionsData.map((_, i) => i);
   resetAll();
   if (singleModeActive) {
     currentIndex = 0;
