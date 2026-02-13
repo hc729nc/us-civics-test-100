@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USCIS 100 Civics Questions Practice Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: white;
+    color: #1a202c;
+    line-height: 1.6;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a365d, #2b6cb0);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+  }
+  .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
+  .header p { font-size: 0.95rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+  .controls {
+    background: white;
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .controls button {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-check { background: #2b6cb0; color: white; }
+  .btn-check:hover { background: #1a4e8a; }
+  .btn-reset { background: #e53e3e; color: white; }
+  .btn-reset:hover { background: #c53030; }
+  .btn-mode { background: #38a169; color: white; }
+  .btn-mode:hover { background: #2f855a; }
+  .btn-shuffle { background: #805ad5; color: white; }
+  .btn-shuffle:hover { background: #6b46c1; }
+  .scoreboard {
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 6px 14px;
+    background: #edf2f7;
+    border-radius: 6px;
+  }
+  .scoreboard .correct { color: #22543d; }
+  .scoreboard .incorrect { color: #9b2c2c; }
+  .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+  .question-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-left: 4px solid #2b6cb0;
+    transition: border-color 0.3s;
+  }
+  .question-card.correct-card { border-left-color: #38a169; background: #f0fff4; }
+  .question-card.incorrect-card { border-left-color: #e53e3e; background: #fff5f5; }
+  .question-card.skipped-card { border-left-color: #d69e2e; background: #fffff0; }
+  .q-number {
+    display: inline-block;
+    background: #2b6cb0;
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .q-header { display: flex; align-items: center; margin-bottom: 12px; }
+  .q-text { font-size: 1.05rem; font-weight: 600; }
+  .q-category {
+    font-size: 0.75rem;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .answer-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .answer-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .answer-input:focus { border-color: #2b6cb0; }
+  .answer-input.input-correct { border-color: #38a169; background: #f0fff4; }
+  .answer-input.input-incorrect { border-color: #e53e3e; background: #fff5f5; }
+  .feedback {
+    font-weight: 700;
+    font-size: 0.9rem;
+    min-width: 90px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-align: center;
+    display: none;
+  }
+  .feedback.show { display: inline-block; }
+  .feedback.correct-fb { background: #c6f6d5; color: #22543d; }
+  .feedback.incorrect-fb { background: #fed7d7; color: #9b2c2c; }
+  .feedback.skipped-fb { background: #fefcbf; color: #744210; }
+  .acceptable-answers {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #edf2f7;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #4a5568;
+    display: none;
+  }
+  .acceptable-answers.show { display: block; }
+  .acceptable-answers strong { color: #2d3748; }
+  .hint-text {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .section-divider {
+    text-align: center;
+    padding: 18px;
+    margin: 24px 0 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    background: linear-gradient(135deg, #ebf4ff, #e9d8fd);
+    border-radius: 10px;
+  }
+  .progress-bar-container {
+    width: 100%;
+    background: #e2e8f0;
+    border-radius: 10px;
+    height: 8px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #38a169, #2b6cb0);
+    border-radius: 10px;
+    transition: width 0.5s;
+    width: 0%;
+  }
+  .single-mode { display: none; }
+  .single-mode.active { display: block; }
+  .all-mode.hidden { display: none; }
+  .nav-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+  .nav-buttons button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    background: #2b6cb0;
+    color: white;
+    transition: all 0.2s;
+  }
+  .nav-buttons button:hover { background: #1a4e8a; }
+  .nav-buttons button:disabled { background: #cbd5e0; cursor: not-allowed; }
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .filter-bar button {
+    padding: 5px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: white;
+    color: #4a5568;
+    transition: all 0.2s;
+  }
+  .filter-bar button.active { border-color: #2b6cb0; background: #ebf8ff; color: #2b6cb0; }
+  .filter-bar button:hover { border-color: #2b6cb0; }
+  footer {
+    text-align: center;
+    padding: 30px 20px;
+    color: #718096;
+    font-size: 0.85rem;
+  }
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.3rem; }
+    .controls { padding: 10px; gap: 6px; }
+    .controls button { padding: 6px 12px; font-size: 0.8rem; }
+    .question-card { padding: 14px 16px; }
+    .answer-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Good Luck on your test Do Yeon!</h1>
+  <p>Type your answer for each question and check if it's correct. Many questions accept multiple valid answers.</p>
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn-check" onclick="checkAll()">Check All Answers</button>
+  <button class="btn-reset" onclick="resetAll()">Reset All</button>
+  <button class="btn-shuffle" onclick="shuffleQuestions()">Shuffle Order</button>
+  <button class="btn-mode" id="modeBtn" onclick="toggleMode()">Single Question Mode</button>
+  <div class="scoreboard" id="scoreboard">
+    <span class="correct" id="scoreCorrect">0</span> /
+    <span id="scoreTotal">0</span> answered
+    (<span class="incorrect" id="scoreIncorrect">0</span> wrong)
+  </div>
+</div>
+
+<div class="container" id="quizContainer"></div>
+
+<div class="single-mode" id="singleMode">
+  <div class="container">
+    <div id="singleCard"></div>
+    <div class="nav-buttons">
+      <button id="prevBtn" onclick="prevQuestion()">Previous</button>
+      <button class="btn-check" onclick="checkSingle()">Check Answer</button>
+      <button id="nextBtn" onclick="nextQuestion()">Next</button>
+    </div>
+    <p style="text-align:center;margin-top:12px;color:#718096;" id="singleProgress"></p>
+  </div>
+</div>
+
+<footer>
+  Based on the official USCIS 100 Civics Questions for the Naturalization Test.<br>
+  Some answers (Senators, Governor, etc.) depend on your state and current officials.
+</footer>
+
+<script>
+const questionsData = [
+  {q:1, question:"What is the supreme law of the land?", answers:["the constitution","constitution"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:2, question:"What does the Constitution do?", answers:["sets up the government","defines the government","protects basic rights of americans"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:3, question:'The idea of self-government is in the first three words of the Constitution. What are these words?', answers:["we the people"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:4, question:"What is an amendment?", answers:["a change to the constitution","an addition to the constitution","a change","an addition"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:5, question:"What do we call the first ten amendments to the Constitution?", answers:["the bill of rights","bill of rights"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:6, question:"What is one right or freedom from the First Amendment?", answers:["speech","religion","assembly","press","petition the government","freedom of speech","freedom of religion","freedom of assembly","freedom of the press","freedom to petition the government"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:7, question:"How many amendments does the Constitution have?", answers:["twenty-seven","27"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:8, question:"What did the Declaration of Independence do?", answers:["announced our independence from great britain","declared our independence from great britain","said that the united states is free from great britain","announced our independence","declared our independence"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:9, question:"What are two rights in the Declaration of Independence?", answers:["life and liberty","life and pursuit of happiness","liberty and pursuit of happiness","life, liberty, and pursuit of happiness","life liberty and pursuit of happiness"], matchAny2:["life","liberty","pursuit of happiness"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:10, question:"What is freedom of religion?", answers:["you can practice any religion or not practice a religion","you can practice any religion","practice any religion or not practice a religion"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:11, question:"What is the economic system in the United States?", answers:["capitalist economy","market economy","capitalism","capitalist","market","free market","free market economy"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:12, question:'What is the "rule of law"?', answers:["everyone must follow the law","leaders must obey the law","government must obey the law","no one is above the law"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:13, question:"Name one branch or part of the government.", answers:["congress","legislative","president","executive","the courts","judicial"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:14, question:"What stops one branch of government from becoming too powerful?", answers:["checks and balances","separation of powers"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:15, question:"Who is in charge of the executive branch?", answers:["the president","president"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:16, question:"Who makes federal laws?", answers:["congress","senate and house of representatives","senate and house","u.s. legislature","national legislature","legislature"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:17, question:"What are the two parts of the U.S. Congress?", answers:["the senate and house of representatives","senate and house of representatives","the senate and the house","senate and house"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:18, question:"How many U.S. Senators are there?", answers:["one hundred","100"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:19, question:"We elect a U.S. Senator for how many years?", answers:["six","6"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:20, question:"Who is one of your state's U.S. Senators now?", answers:[], stateSpecific:true, category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:21, question:"The House of Representatives has how many voting members?", answers:["four hundred thirty-five","435"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:22, question:"We elect a U.S. Representative for how many years?", answers:["two","2"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:23, question:"Name your U.S. Representative.", answers:[], stateSpecific:true, category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:24, question:"Who does a U.S. Senator represent?", answers:["all people of the state","all the people of the state","the people of the state","the people of their state"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:25, question:"Why do some states have more Representatives than other states?", answers:["because of the states population","the states population","because they have more people","some states have more people","population","because of population"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:26, question:"We elect a President for how many years?", answers:["four","4"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:27, question:"In what month do we vote for President?", answers:["november"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:28, question:"What is the name of the President of the United States now?", answers:["donald trump","trump","donald j trump","donald j. trump"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:29, question:"What is the name of the Vice President of the United States now?", answers:["jd vance","j.d. vance","j d vance","vance","james david vance"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:30, question:"If the President can no longer serve, who becomes President?", answers:["the vice president","vice president"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:31, question:"If both the President and the Vice President can no longer serve, who becomes President?", answers:["the speaker of the house","speaker of the house"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:32, question:"Who is the Commander in Chief of the military?", answers:["the president","president"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:33, question:"Who signs bills to become laws?", answers:["the president","president"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:34, question:"Who vetoes bills?", answers:["the president","president"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:35, question:"What does the President's Cabinet do?", answers:["advises the president","advise the president"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:36, question:"What are two Cabinet-level positions?", answers:[], matchAny2:["secretary of agriculture","secretary of commerce","secretary of defense","secretary of education","secretary of energy","secretary of health and human services","secretary of the interior","secretary of labor","secretary of state","secretary of transportation","secretary of the treasury","secretary of veterans affairs","secretary of homeland security","secretary of housing and urban development","attorney general","vice president"], allAnswersDisplay:["Attorney General","Vice President","Secretary of Agriculture","Secretary of Commerce","Secretary of Defense","Secretary of Education","Secretary of Energy","Secretary of Health and Human Services","Secretary of the Interior","Secretary of Labor","Secretary of State","Secretary of Transportation","Secretary of the Treasury","Secretary of Veterans Affairs","Secretary of Homeland Security","Secretary of Housing and Urban Development"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:37, question:"What does the judicial branch do?", answers:["reviews laws","explains laws","resolves disputes","resolves disagreements","decides if a law goes against the constitution"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:38, question:"What is the highest court in the United States?", answers:["the supreme court","supreme court"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:39, question:"How many justices are on the Supreme Court?", answers:["nine","9"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:40, question:"Who is the Chief Justice of the United States now?", answers:["john roberts","roberts","john g. roberts jr","john g roberts"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:41, question:"Under our Constitution, some powers belong to the federal government. What is one power of the federal government?", answers:["to print money","print money","to declare war","declare war","to create an army","create an army","to make treaties","make treaties"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:42, question:"Under our Constitution, some powers belong to the states. What is one power of the states?", answers:["provide schooling and education","provide schooling","provide education","provide protection","provide police","provide safety","provide fire departments","give a drivers license","approve zoning and land use","approve zoning"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:43, question:"Who is the Governor of your state now?", answers:[], stateSpecific:true, category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:44, question:"What is the capital of your state?", answers:[], stateSpecific:true, category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:45, question:"What are the two major political parties in the United States?", answers:["democratic and republican","republican and democratic","democrat and republican","republican and democrat"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:46, question:"What is the political party of the President now?", answers:["republican","republican party"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:47, question:"What is the name of the Speaker of the House of Representatives now?", answers:["mike johnson","johnson","michael johnson"], category:"AMERICAN GOVERNMENT: System of Government"},
+  {q:48, question:"There are four amendments to the Constitution about who can vote. Describe one of them.", answers:["citizens eighteen and older can vote","you dont have to pay a poll tax to vote","any citizen can vote","women and men can vote","a male citizen of any race can vote","citizens 18 and older can vote","you dont have to pay to vote","any citizen can vote women and men can vote"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:49, question:"What is one responsibility that is only for United States citizens?", answers:["serve on a jury","vote in a federal election","vote"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:50, question:"Name one right only for United States citizens.", answers:["vote in a federal election","run for federal office","vote","run for office"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:51, question:"What are two rights of everyone living in the United States?", answers:[], matchAny2:["freedom of expression","freedom of speech","freedom of assembly","freedom to petition the government","freedom of religion","the right to bear arms","right to bear arms","bear arms"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:52, question:"What do we show loyalty to when we say the Pledge of Allegiance?", answers:["the united states","the flag","united states","flag","the united states and the flag"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:53, question:"What is one promise you make when you become a United States citizen?", answers:["give up loyalty to other countries","defend the constitution and laws of the united states","obey the laws of the united states","serve in the u.s. military if needed","serve the nation if needed","be loyal to the united states","defend the constitution","obey the laws"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:54, question:"How old do citizens have to be to vote for President?", answers:["eighteen","18","eighteen and older","18 and older"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:55, question:"What are two ways that Americans can participate in their democracy?", answers:[], matchAny2:["vote","join a political party","help with a campaign","join a civic group","join a community group","give an elected official your opinion on an issue","call senators and representatives","publicly support or oppose an issue or policy","run for office","write to a newspaper"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:56, question:"When is the last day you can send in federal income tax forms?", answers:["april 15","april 15th","april fifteenth"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:57, question:"When must all men register for the Selective Service?", answers:["at age eighteen","at age 18","between eighteen and twenty-six","between 18 and 26","18","at 18"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:58, question:"What is one reason colonists came to America?", answers:["freedom","political liberty","religious freedom","economic opportunity","practice their religion","escape persecution"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:59, question:"Who lived in America before the Europeans arrived?", answers:["american indians","native americans","native american","american indian"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:60, question:"What group of people was taken to America and sold as slaves?", answers:["africans","people from africa","african people"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:61, question:"Why did the colonists fight the British?", answers:["because of high taxes","taxation without representation","because the british army stayed in their houses","boarding","quartering","because they didnt have self-government","they didnt have self government","high taxes","no self-government","no self government"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:62, question:"Who wrote the Declaration of Independence?", answers:["thomas jefferson","jefferson"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:63, question:"When was the Declaration of Independence adopted?", answers:["july 4 1776","july 4, 1776","1776","july fourth 1776"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:64, question:"There were 13 original states. Name three.", answers:[], matchAny3:["new hampshire","massachusetts","rhode island","connecticut","new york","new jersey","pennsylvania","delaware","maryland","virginia","north carolina","south carolina","georgia"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:65, question:"What happened at the Constitutional Convention?", answers:["the constitution was written","the founding fathers wrote the constitution","constitution was written","wrote the constitution"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:66, question:"When was the Constitution written?", answers:["1787"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:67, question:"The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.", answers:["james madison","madison","alexander hamilton","hamilton","john jay","jay","publius"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:68, question:"What is one thing Benjamin Franklin is famous for?", answers:["u.s. diplomat","us diplomat","diplomat","oldest member of the constitutional convention","first postmaster general of the united states","first postmaster general","writer of poor richards almanac","poor richards almanac","started the first free libraries","first free libraries"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:69, question:'Who is the "Father of Our Country"?', answers:["george washington","washington"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:70, question:"Who was the first President?", answers:["george washington","washington"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:71, question:"What territory did the United States buy from France in 1803?", answers:["the louisiana territory","louisiana territory","louisiana","louisiana purchase"], category:"AMERICAN HISTORY: 1800s"},
+  {q:72, question:"Name one war fought by the United States in the 1800s.", answers:["war of 1812","mexican-american war","mexican american war","civil war","the civil war","spanish-american war","spanish american war"], category:"AMERICAN HISTORY: 1800s"},
+  {q:73, question:"Name the U.S. war between the North and the South.", answers:["the civil war","civil war","the war between the states","war between the states"], category:"AMERICAN HISTORY: 1800s"},
+  {q:74, question:"Name one problem that led to the Civil War.", answers:["slavery","economic reasons","states rights","states' rights"], category:"AMERICAN HISTORY: 1800s"},
+  {q:75, question:"What was one important thing that Abraham Lincoln did?", answers:["freed the slaves","emancipation proclamation","saved the union","preserved the union","led the united states during the civil war"], category:"AMERICAN HISTORY: 1800s"},
+  {q:76, question:"What did the Emancipation Proclamation do?", answers:["freed the slaves","freed slaves in the confederacy","freed slaves in the confederate states","freed slaves in most southern states"], category:"AMERICAN HISTORY: 1800s"},
+  {q:77, question:"What did Susan B. Anthony do?", answers:["fought for womens rights","fought for women's rights","fought for civil rights","womens rights","women's rights"], category:"AMERICAN HISTORY: 1800s"},
+  {q:78, question:"Name one war fought by the United States in the 1900s.", answers:["world war i","world war 1","world war ii","world war 2","korean war","vietnam war","persian gulf war","gulf war","wwi","wwii","ww1","ww2"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:79, question:"Who was President during World War I?", answers:["woodrow wilson","wilson"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:80, question:"Who was President during the Great Depression and World War II?", answers:["franklin roosevelt","franklin d roosevelt","franklin d. roosevelt","roosevelt","fdr"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:81, question:"Who did the United States fight in World War II?", answers:["japan germany and italy","japan, germany, and italy","japan germany italy"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:82, question:"Before he was President, Eisenhower was a general. What war was he in?", answers:["world war ii","world war 2","wwii","ww2"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:83, question:"During the Cold War, what was the main concern of the United States?", answers:["communism"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:84, question:"What movement tried to end racial discrimination?", answers:["civil rights movement","civil rights","the civil rights movement"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:85, question:"What did Martin Luther King, Jr. do?", answers:["fought for civil rights","worked for equality for all americans","civil rights","equality"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:86, question:"What major event happened on September 11, 2001, in the United States?", answers:["terrorists attacked the united states","terrorists attacked","terrorist attacks","9/11","september 11 attacks"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:87, question:"Name one American Indian tribe in the United States.", answers:["cherokee","navajo","sioux","chippewa","choctaw","pueblo","apache","iroquois","creek","blackfeet","seminole","cheyenne","arawak","shawnee","mohegan","huron","oneida","lakota","crow","teton","hopi","inuit"], category:"AMERICAN HISTORY: Recent American History"},
+  {q:88, question:"Name one of the two longest rivers in the United States.", answers:["missouri","missouri river","mississippi","mississippi river"], category:"INTEGRATED CIVICS: Geography"},
+  {q:89, question:"What ocean is on the West Coast of the United States?", answers:["pacific ocean","pacific","the pacific ocean","the pacific"], category:"INTEGRATED CIVICS: Geography"},
+  {q:90, question:"What ocean is on the East Coast of the United States?", answers:["atlantic ocean","atlantic","the atlantic ocean","the atlantic"], category:"INTEGRATED CIVICS: Geography"},
+  {q:91, question:"Name one U.S. territory.", answers:["puerto rico","u.s. virgin islands","us virgin islands","virgin islands","american samoa","northern mariana islands","guam"], category:"INTEGRATED CIVICS: Geography"},
+  {q:92, question:"Name one state that borders Canada.", answers:["maine","new hampshire","vermont","new york","pennsylvania","ohio","michigan","minnesota","north dakota","montana","idaho","washington","alaska"], category:"INTEGRATED CIVICS: Geography"},
+  {q:93, question:"Name one state that borders Mexico.", answers:["california","arizona","new mexico","texas"], category:"INTEGRATED CIVICS: Geography"},
+  {q:94, question:"What is the capital of the United States?", answers:["washington d.c.","washington dc","washington, d.c.","washington d.c","dc","d.c."], category:"INTEGRATED CIVICS: Geography"},
+  {q:95, question:"Where is the Statue of Liberty?", answers:["new york harbor","new york","liberty island","new york city","nyc","new jersey","near new york city","on the hudson river","on the hudson","hudson river"], category:"INTEGRATED CIVICS: Geography"},
+  {q:96, question:"Why does the flag have 13 stripes?", answers:["because there were 13 original colonies","because the stripes represent the original colonies","13 original colonies","the stripes represent the original colonies","for the original 13 colonies","for the 13 original colonies"], category:"INTEGRATED CIVICS: Symbols"},
+  {q:97, question:"Why does the flag have 50 stars?", answers:["because there is one star for each state","because each star represents a state","because there are 50 states","one star for each state","one for each state","50 states","there are 50 states"], category:"INTEGRATED CIVICS: Symbols"},
+  {q:98, question:"What is the name of the national anthem?", answers:["the star-spangled banner","star-spangled banner","the star spangled banner","star spangled banner"], category:"INTEGRATED CIVICS: Symbols"},
+  {q:99, question:"When do we celebrate Independence Day?", answers:["july 4","july 4th","july fourth","fourth of july","4th of july"], category:"INTEGRATED CIVICS: Holidays"},
+  {q:100, question:"Name two national U.S. holidays.", answers:[], matchAny2:["new years day","new year's day","presidents day","presidents' day","memorial day","independence day","july 4th","july fourth","martin luther king jr day","martin luther king day","mlk day","labor day","columbus day","veterans day","thanksgiving","christmas"], category:"INTEGRATED CIVICS: Holidays"}
+];
+
+let currentIndex = 0;
+let singleModeActive = false;
+let displayOrder = questionsData.map((_, i) => i);
+
+function normalize(str) {
+  return str.toLowerCase().trim()
+    .replace(/['''`]/g, '')
+    .replace(/[.,;:!?"()]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+function checkAnswer(qIndex) {
+  const data = questionsData[displayOrder[qIndex]];
+  const input = document.getElementById('input-' + qIndex);
+  const feedback = document.getElementById('feedback-' + qIndex);
+  const card = document.getElementById('card-' + qIndex);
+  const acceptable = document.getElementById('acceptable-' + qIndex);
+  const userAnswer = normalize(input.value);
+
+  if (!userAnswer) {
+    feedback.className = 'feedback show skipped-fb';
+    feedback.textContent = 'SKIPPED';
+    card.className = 'question-card skipped-card';
+    acceptable.classList.add('show');
+    return 'skipped';
+  }
+
+  if (data.stateSpecific) {
+    feedback.className = 'feedback show skipped-fb';
+    feedback.textContent = 'SELF-CHECK';
+    card.className = 'question-card skipped-card';
+    acceptable.classList.add('show');
+    return 'skipped';
+  }
+
+  let isCorrect = false;
+
+  // Check direct answers
+  if (data.answers && data.answers.length > 0) {
+    for (const ans of data.answers) {
+      if (userAnswer === normalize(ans) || normalize(ans).includes(userAnswer) || userAnswer.includes(normalize(ans))) {
+        isCorrect = true;
+        break;
+      }
+    }
+  }
+
+  // Check matchAny2 (need to mention at least 2 from list)
+  if (!isCorrect && data.matchAny2) {
+    let matchCount = 0;
+    for (const ans of data.matchAny2) {
+      if (userAnswer.includes(normalize(ans))) {
+        matchCount++;
+      }
+    }
+    if (matchCount >= 2) isCorrect = true;
+  }
+
+  // Check matchAny3 (need to mention at least 3 from list)
+  if (!isCorrect && data.matchAny3) {
+    let matchCount = 0;
+    for (const ans of data.matchAny3) {
+      if (userAnswer.includes(normalize(ans))) {
+        matchCount++;
+      }
+    }
+    if (matchCount >= 3) isCorrect = true;
+  }
+
+  // For matchAny2/matchAny3 with no direct answers, also accept any single item as partial
+  if (!isCorrect && (data.matchAny2 || data.matchAny3) && data.answers.length === 0) {
+    const list = data.matchAny2 || data.matchAny3;
+    for (const ans of list) {
+      if (userAnswer === normalize(ans)) {
+        // Single item match - mark as partial but let it pass with a note
+        feedback.className = 'feedback show skipped-fb';
+        feedback.textContent = 'PARTIAL';
+        card.className = 'question-card skipped-card';
+        acceptable.classList.add('show');
+        return 'skipped';
+      }
+    }
+  }
+
+  if (isCorrect) {
+    feedback.className = 'feedback show correct-fb';
+    feedback.textContent = 'CORRECT';
+    input.className = 'answer-input input-correct';
+    card.className = 'question-card correct-card';
+    return 'correct';
+  } else {
+    feedback.className = 'feedback show incorrect-fb';
+    feedback.textContent = 'INCORRECT';
+    input.className = 'answer-input input-incorrect';
+    card.className = 'question-card incorrect-card';
+    acceptable.classList.add('show');
+    return 'incorrect';
+  }
+}
+
+function renderAllQuestions() {
+  const container = document.getElementById('quizContainer');
+  let html = '';
+  let lastCategory = '';
+
+  for (let i = 0; i < displayOrder.length; i++) {
+    const data = questionsData[displayOrder[i]];
+    if (data.category !== lastCategory) {
+      lastCategory = data.category;
+      html += '<div class="section-divider">' + escapeHtml(data.category) + '</div>';
+    }
+    html += buildCard(i, data);
+  }
+  container.innerHTML = html;
+}
+
+function buildCard(idx, data) {
+  const hintText = data.stateSpecific
+    ? '<div class="hint-text">This answer depends on your state. Check your own answer.</div>'
+    : data.matchAny2
+    ? '<div class="hint-text">Name two. Separate with "and" or a comma.</div>'
+    : data.matchAny3
+    ? '<div class="hint-text">Name three. Separate with commas.</div>'
+    : '';
+
+  const allAnswers = getAllAcceptableDisplay(data);
+
+  return `
+    <div class="question-card" id="card-${idx}">
+      <div class="q-header">
+        <span class="q-number">${data.q}</span>
+        <span class="q-text">${escapeHtml(data.question)}</span>
+      </div>
+      ${hintText}
+      <div class="answer-row">
+        <input type="text" class="answer-input" id="input-${idx}"
+          placeholder="Type your answer..." autocomplete="off"
+          onkeydown="if(event.key==='Enter'){${singleModeActive ? 'checkSingle()' : `checkSingleQ(${idx})`}}">
+        <span class="feedback" id="feedback-${idx}"></span>
+      </div>
+      <div class="acceptable-answers" id="acceptable-${idx}">
+        <strong>Acceptable answers:</strong> ${allAnswers}
+      </div>
+    </div>`;
+}
+
+function getAllAcceptableDisplay(data) {
+  let list = [];
+  if (data.allAnswersDisplay) return data.allAnswersDisplay.join(' | ');
+  if (data.stateSpecific) return 'Depends on your state — check <a href="https://www.uscis.gov/citizenship" target="_blank">USCIS.gov</a>';
+  if (data.answers && data.answers.length > 0) {
+    list = list.concat(data.answers);
+  }
+  if (data.matchAny2) list = list.concat(data.matchAny2.map(a => a));
+  if (data.matchAny3) list = list.concat(data.matchAny3.map(a => a));
+  // Deduplicate and capitalize
+  const seen = new Set();
+  const unique = [];
+  for (const item of list) {
+    const n = normalize(item);
+    if (!seen.has(n)) {
+      seen.add(n);
+      unique.push(item.replace(/\b\w/g, c => c.toUpperCase()));
+    }
+  }
+  return unique.join(' | ');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function checkSingleQ(idx) {
+  checkAnswer(idx);
+  updateScore();
+}
+
+function checkAll() {
+  for (let i = 0; i < displayOrder.length; i++) {
+    checkAnswer(i);
+  }
+  updateScore();
+}
+
+function checkSingle() {
+  checkAnswer(currentIndex);
+  updateScore();
+}
+
+function updateScore() {
+  let correct = 0, incorrect = 0, total = 0;
+  for (let i = 0; i < displayOrder.length; i++) {
+    const fb = document.getElementById('feedback-' + i);
+    if (fb && fb.classList.contains('show')) {
+      if (fb.classList.contains('correct-fb')) { correct++; total++; }
+      else if (fb.classList.contains('incorrect-fb')) { incorrect++; total++; }
+      else { total++; }
+    }
+  }
+  document.getElementById('scoreCorrect').textContent = correct;
+  document.getElementById('scoreIncorrect').textContent = incorrect;
+  document.getElementById('scoreTotal').textContent = total;
+  const pct = (total / displayOrder.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function resetAll() {
+  for (let i = 0; i < displayOrder.length; i++) {
+    const input = document.getElementById('input-' + i);
+    const feedback = document.getElementById('feedback-' + i);
+    const card = document.getElementById('card-' + i);
+    const acceptable = document.getElementById('acceptable-' + i);
+    if (input) { input.value = ''; input.className = 'answer-input'; }
+    if (feedback) { feedback.className = 'feedback'; feedback.textContent = ''; }
+    if (card) card.className = 'question-card';
+    if (acceptable) acceptable.classList.remove('show');
+  }
+  document.getElementById('scoreCorrect').textContent = '0';
+  document.getElementById('scoreIncorrect').textContent = '0';
+  document.getElementById('scoreTotal').textContent = '0';
+  document.getElementById('progressBar').style.width = '0%';
+}
+
+function toggleMode() {
+  singleModeActive = !singleModeActive;
+  const btn = document.getElementById('modeBtn');
+  const allContainer = document.getElementById('quizContainer');
+  const singleContainer = document.getElementById('singleMode');
+
+  if (singleModeActive) {
+    btn.textContent = 'All Questions Mode';
+    allContainer.classList.add('hidden');
+    singleContainer.classList.add('active');
+    currentIndex = 0;
+    renderSingleQuestion();
+  } else {
+    btn.textContent = 'Single Question Mode';
+    allContainer.classList.remove('hidden');
+    singleContainer.classList.remove('active');
+    renderAllQuestions();
+  }
+}
+
+function renderSingleQuestion() {
+  const data = questionsData[displayOrder[currentIndex]];
+  const card = document.getElementById('singleCard');
+  card.innerHTML = buildCard(currentIndex, data);
+  document.getElementById('prevBtn').disabled = currentIndex === 0;
+  document.getElementById('nextBtn').disabled = currentIndex === displayOrder.length - 1;
+  document.getElementById('singleProgress').textContent =
+    `Question ${currentIndex + 1} of ${displayOrder.length}`;
+  setTimeout(() => {
+    const input = document.getElementById('input-' + currentIndex);
+    if (input) input.focus();
+  }, 100);
+}
+
+function nextQuestion() {
+  if (currentIndex < displayOrder.length - 1) {
+    currentIndex++;
+    renderSingleQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderSingleQuestion();
+  }
+}
+
+function shuffleQuestions() {
+  for (let i = displayOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [displayOrder[i], displayOrder[j]] = [displayOrder[j], displayOrder[i]];
+  }
+  resetAll();
+  if (singleModeActive) {
+    currentIndex = 0;
+    renderSingleQuestion();
+  } else {
+    renderAllQuestions();
+  }
+}
+
+// Initialize
+renderAllQuestions();
+</script>
+</body>
+</html>
