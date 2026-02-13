@@ -89,13 +89,6 @@
   }
   .q-header { display: flex; align-items: center; margin-bottom: 12px; }
   .q-text { font-size: 1.05rem; font-weight: 600; }
-  .q-category {
-    font-size: 0.75rem;
-    color: #718096;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
   .answer-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .answer-input {
     flex: 1;
@@ -165,9 +158,9 @@
     transition: width 0.5s;
     width: 0%;
   }
-  .single-mode { display: none; }
-  .single-mode.active { display: block; }
-  .all-mode.hidden { display: none; }
+  #singleMode { display: none; }
+  #singleMode.active { display: block; }
+  #quizContainer.hidden { display: none; }
   .nav-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
   .nav-buttons button {
     padding: 10px 24px;
@@ -182,25 +175,6 @@
   }
   .nav-buttons button:hover { background: #1a4e8a; }
   .nav-buttons button:disabled { background: #cbd5e0; cursor: not-allowed; }
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .filter-bar button {
-    padding: 5px 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: white;
-    color: #4a5568;
-    transition: all 0.2s;
-  }
-  .filter-bar button.active { border-color: #2b6cb0; background: #ebf8ff; color: #2b6cb0; }
-  .filter-bar button:hover { border-color: #2b6cb0; }
   footer {
     text-align: center;
     padding: 30px 20px;
@@ -227,7 +201,7 @@
 </div>
 
 <div class="controls">
-  <button class="btn-check" onclick="checkAll()">Check All Answers</button>
+  <button class="btn-check" id="checkAllBtn" onclick="checkAll()">Check All Answers</button>
   <button class="btn-reset" onclick="resetAll()">Reset All</button>
   <button class="btn-shuffle" onclick="shuffleQuestions()">Shuffle Order</button>
   <button class="btn-reset" onclick="resetOrder()">Reset Order</button>
@@ -239,9 +213,9 @@
   </div>
 </div>
 
-<div class="container all-mode" id="quizContainer"></div>
+<div class="container" id="quizContainer"></div>
 
-<div class="single-mode" id="singleMode">
+<div id="singleMode">
   <div class="container">
     <div id="singleCard"></div>
     <div class="nav-buttons">
@@ -262,7 +236,7 @@
 const questionsData = [
   {q:1, question:"What is the supreme law of the land?", answers:["the constitution","constitution"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:2, question:"What does the Constitution do?", answers:["sets up the government","defines the government","protects basic rights of americans"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
-  {q:3, question:'The idea of self-government is in the first three words of the Constitution. What are these words?', answers:["we the people"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:3, question:"The idea of self-government is in the first three words of the Constitution. What are these words?", answers:["we the people"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:4, question:"What is an amendment?", answers:["a change to the constitution","an addition to the constitution","a change","an addition"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:5, question:"What do we call the first ten amendments to the Constitution?", answers:["the bill of rights","bill of rights"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:6, question:"What is one right or freedom from the First Amendment?", answers:["speech","religion","assembly","press","petition the government","freedom of speech","freedom of religion","freedom of assembly","freedom of the press","freedom to petition the government"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
@@ -271,7 +245,7 @@ const questionsData = [
   {q:9, question:"What are two rights in the Declaration of Independence?", answers:["life and liberty","life and pursuit of happiness","liberty and pursuit of happiness","life, liberty, and pursuit of happiness","life liberty and pursuit of happiness"], matchAny2:["life","liberty","pursuit of happiness"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:10, question:"What is freedom of religion?", answers:["you can practice any religion or not practice a religion","you can practice any religion","practice any religion or not practice a religion"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:11, question:"What is the economic system in the United States?", answers:["capitalist economy","market economy","capitalism","capitalist","market","free market","free market economy"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
-  {q:12, question:'What is the "rule of law"?', answers:["everyone must follow the law","leaders must obey the law","government must obey the law","no one is above the law"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
+  {q:12, question:"What is the rule of law?", answers:["everyone must follow the law","leaders must obey the law","government must obey the law","no one is above the law"], category:"AMERICAN GOVERNMENT: Principles of American Democracy"},
   {q:13, question:"Name one branch or part of the government.", answers:["congress","legislative","president","executive","the courts","judicial"], category:"AMERICAN GOVERNMENT: System of Government"},
   {q:14, question:"What stops one branch of government from becoming too powerful?", answers:["checks and balances","separation of powers"], category:"AMERICAN GOVERNMENT: System of Government"},
   {q:15, question:"Who is in charge of the executive branch?", answers:["the president","president"], category:"AMERICAN GOVERNMENT: System of Government"},
@@ -307,7 +281,7 @@ const questionsData = [
   {q:45, question:"What are the two major political parties in the United States?", answers:["democratic and republican","republican and democratic","democrat and republican","republican and democrat"], category:"AMERICAN GOVERNMENT: System of Government"},
   {q:46, question:"What is the political party of the President now?", answers:["republican","republican party"], category:"AMERICAN GOVERNMENT: System of Government"},
   {q:47, question:"What is the name of the Speaker of the House of Representatives now?", answers:["mike johnson","johnson","michael johnson"], category:"AMERICAN GOVERNMENT: System of Government"},
-  {q:48, question:"There are four amendments to the Constitution about who can vote. Describe one of them.", answers:["citizens eighteen and older can vote","you dont have to pay a poll tax to vote","any citizen can vote","women and men can vote","a male citizen of any race can vote","citizens 18 and older can vote","you dont have to pay to vote","any citizen can vote women and men can vote"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
+  {q:48, question:"There are four amendments to the Constitution about who can vote. Describe one of them.", answers:["citizens eighteen and older can vote","you dont have to pay a poll tax to vote","any citizen can vote","women and men can vote","a male citizen of any race can vote","citizens 18 and older can vote","you dont have to pay to vote"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
   {q:49, question:"What is one responsibility that is only for United States citizens?", answers:["serve on a jury","vote in a federal election","vote"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
   {q:50, question:"Name one right only for United States citizens.", answers:["vote in a federal election","run for federal office","vote","run for office"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
   {q:51, question:"What are two rights of everyone living in the United States?", answers:[], matchAny2:["freedom of expression","freedom of speech","freedom of assembly","freedom to petition the government","freedom of religion","the right to bear arms","right to bear arms","bear arms"], category:"AMERICAN GOVERNMENT: Rights and Responsibilities"},
@@ -328,7 +302,7 @@ const questionsData = [
   {q:66, question:"When was the Constitution written?", answers:["1787"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
   {q:67, question:"The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.", answers:["james madison","madison","alexander hamilton","hamilton","john jay","jay","publius"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
   {q:68, question:"What is one thing Benjamin Franklin is famous for?", answers:["u.s. diplomat","us diplomat","diplomat","oldest member of the constitutional convention","first postmaster general of the united states","first postmaster general","writer of poor richards almanac","poor richards almanac","started the first free libraries","first free libraries"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
-  {q:69, question:'Who is the "Father of Our Country"?', answers:["george washington","washington"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
+  {q:69, question:"Who is the Father of Our Country?", answers:["george washington","washington"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
   {q:70, question:"Who was the first President?", answers:["george washington","washington"], category:"AMERICAN HISTORY: Colonial Period and Independence"},
   {q:71, question:"What territory did the United States buy from France in 1803?", answers:["the louisiana territory","louisiana territory","louisiana","louisiana purchase"], category:"AMERICAN HISTORY: 1800s"},
   {q:72, question:"Name one war fought by the United States in the 1800s.", answers:["war of 1812","mexican-american war","mexican american war","civil war","the civil war","spanish-american war","spanish american war"], category:"AMERICAN HISTORY: 1800s"},
@@ -336,7 +310,7 @@ const questionsData = [
   {q:74, question:"Name one problem that led to the Civil War.", answers:["slavery","economic reasons","states rights","states' rights"], category:"AMERICAN HISTORY: 1800s"},
   {q:75, question:"What was one important thing that Abraham Lincoln did?", answers:["freed the slaves","emancipation proclamation","saved the union","preserved the union","led the united states during the civil war"], category:"AMERICAN HISTORY: 1800s"},
   {q:76, question:"What did the Emancipation Proclamation do?", answers:["freed the slaves","freed slaves in the confederacy","freed slaves in the confederate states","freed slaves in most southern states"], category:"AMERICAN HISTORY: 1800s"},
-  {q:77, question:"What did Susan B. Anthony do?", answers:["fought for womens rights","fought for women's rights","fought for civil rights","womens rights","women's rights"], category:"AMERICAN HISTORY: 1800s"},
+  {q:77, question:"What did Susan B. Anthony do?", answers:["fought for womens rights","fought for womens rights","fought for civil rights","womens rights","womens rights"], category:"AMERICAN HISTORY: 1800s"},
   {q:78, question:"Name one war fought by the United States in the 1900s.", answers:["world war i","world war 1","world war ii","world war 2","korean war","vietnam war","persian gulf war","gulf war","wwi","wwii","ww1","ww2"], category:"AMERICAN HISTORY: Recent American History"},
   {q:79, question:"Who was President during World War I?", answers:["woodrow wilson","wilson"], category:"AMERICAN HISTORY: Recent American History"},
   {q:80, question:"Who was President during the Great Depression and World War II?", answers:["franklin roosevelt","franklin d roosevelt","franklin d. roosevelt","roosevelt","fdr"], category:"AMERICAN HISTORY: Recent American History"},
@@ -359,278 +333,240 @@ const questionsData = [
   {q:97, question:"Why does the flag have 50 stars?", answers:["because there is one star for each state","because each star represents a state","because there are 50 states","one star for each state","one for each state","50 states","there are 50 states"], category:"INTEGRATED CIVICS: Symbols"},
   {q:98, question:"What is the name of the national anthem?", answers:["the star-spangled banner","star-spangled banner","the star spangled banner","star spangled banner"], category:"INTEGRATED CIVICS: Symbols"},
   {q:99, question:"When do we celebrate Independence Day?", answers:["july 4","july 4th","july fourth","fourth of july","4th of july"], category:"INTEGRATED CIVICS: Holidays"},
-  {q:100, question:"Name two national U.S. holidays.", answers:[], matchAny2:["new years day","new year's day","presidents day","presidents' day","memorial day","independence day","july 4th","july fourth","martin luther king jr day","martin luther king day","mlk day","labor day","columbus day","veterans day","thanksgiving","christmas"], category:"INTEGRATED CIVICS: Holidays"}
+  {q:100, question:"Name two national U.S. holidays.", answers:[], matchAny2:["new years day","new years day","presidents day","presidents day","memorial day","independence day","july 4th","july fourth","martin luther king jr day","martin luther king day","mlk day","labor day","columbus day","veterans day","thanksgiving","christmas"], category:"INTEGRATED CIVICS: Holidays"}
 ];
 
 let currentIndex = 0;
 let singleModeActive = false;
 let isShuffled = false;
-let displayOrder = questionsData.map((_, i) => i);
+let displayOrder = questionsData.map(function(_, i) { return i; });
+// Track results for score
+let results = {};
 
 function normalize(str) {
   return str.toLowerCase().trim()
-    .replace(/['''`]/g, '')
-    .replace(/[.,;:!?"()]/g, '')
+    .replace(/[^a-z0-9 ]/g, '')
     .replace(/\s+/g, ' ');
 }
 
-function checkAnswer(qIndex) {
-  const data = questionsData[displayOrder[qIndex]];
-  const input = document.getElementById('input-' + qIndex);
-  const feedback = document.getElementById('feedback-' + qIndex);
-  const card = document.getElementById('card-' + qIndex);
-  const acceptable = document.getElementById('acceptable-' + qIndex);
-  if (!input || !feedback || !card || !acceptable || !data) return 'skipped';
-  const userAnswer = normalize(input.value);
+function closeEnough(user, ans) {
+  if (user === ans) return true;
+  if (user.length > 0 && user.includes(ans)) return true;
+  if (user.length > 0 && ans.includes(user) && user.length >= ans.length * 0.5) return true;
+  return false;
+}
 
-  if (!userAnswer) {
-    feedback.className = 'feedback show skipped-fb';
-    feedback.textContent = 'SKIPPED';
-    card.className = 'question-card skipped-card';
-    acceptable.classList.add('show');
-    return 'skipped';
-  }
+function gradeAnswer(dataIndex, userText) {
+  var data = questionsData[dataIndex];
+  var userAnswer = normalize(userText);
 
-  if (data.stateSpecific) {
-    feedback.className = 'feedback show skipped-fb';
-    feedback.textContent = 'SELF-CHECK';
-    card.className = 'question-card skipped-card';
-    acceptable.classList.add('show');
-    return 'skipped';
-  }
-
-  let isCorrect = false;
-
-  function closeEnough(user, ans) {
-    if (user === ans) return true;
-    if (user.includes(ans)) return true;
-    if (ans.includes(user) && user.length >= ans.length * 0.5) return true;
-    return false;
-  }
+  if (!userAnswer) return 'empty';
+  if (data.stateSpecific) return 'state';
 
   // Check direct answers
   if (data.answers && data.answers.length > 0) {
-    for (const ans of data.answers) {
-      if (closeEnough(userAnswer, normalize(ans))) {
-        isCorrect = true;
-        break;
-      }
+    for (var i = 0; i < data.answers.length; i++) {
+      if (closeEnough(userAnswer, normalize(data.answers[i]))) return 'correct';
     }
   }
 
-  // Check matchAny2 (need to mention at least 2 from list)
-  if (!isCorrect && data.matchAny2) {
-    let matchCount = 0;
-    for (const ans of data.matchAny2) {
-      if (userAnswer.includes(normalize(ans))) {
-        matchCount++;
-      }
+  // Check matchAny2
+  if (data.matchAny2) {
+    var count = 0;
+    for (var i = 0; i < data.matchAny2.length; i++) {
+      if (userAnswer.includes(normalize(data.matchAny2[i]))) count++;
     }
-    if (matchCount >= 2) isCorrect = true;
+    if (count >= 2) return 'correct';
   }
 
-  // Check matchAny3 (need to mention at least 3 from list)
-  if (!isCorrect && data.matchAny3) {
-    let matchCount = 0;
-    for (const ans of data.matchAny3) {
-      if (userAnswer.includes(normalize(ans))) {
-        matchCount++;
-      }
+  // Check matchAny3
+  if (data.matchAny3) {
+    var count = 0;
+    for (var i = 0; i < data.matchAny3.length; i++) {
+      if (userAnswer.includes(normalize(data.matchAny3[i]))) count++;
     }
-    if (matchCount >= 3) isCorrect = true;
+    if (count >= 3) return 'correct';
   }
 
-  // For matchAny2/matchAny3 with no direct answers, also accept any single item as partial
-  if (!isCorrect && (data.matchAny2 || data.matchAny3) && data.answers.length === 0) {
-    const list = data.matchAny2 || data.matchAny3;
-    for (const ans of list) {
-      if (userAnswer === normalize(ans)) {
-        // Single item match - mark as partial but let it pass with a note
-        feedback.className = 'feedback show skipped-fb';
-        feedback.textContent = 'PARTIAL';
-        card.className = 'question-card skipped-card';
-        acceptable.classList.add('show');
-        return 'skipped';
-      }
-    }
-  }
-
-  if (isCorrect) {
-    feedback.className = 'feedback show correct-fb';
-    feedback.textContent = 'CORRECT';
-    input.className = 'answer-input input-correct';
-    card.className = 'question-card correct-card';
-    return 'correct';
-  } else {
-    feedback.className = 'feedback show incorrect-fb';
-    feedback.textContent = 'INCORRECT';
-    input.className = 'answer-input input-incorrect';
-    card.className = 'question-card incorrect-card';
-    acceptable.classList.add('show');
-    return 'incorrect';
-  }
-}
-
-function renderAllQuestions() {
-  const container = document.getElementById('quizContainer');
-  let html = '';
-  let lastCategory = '';
-
-  for (let i = 0; i < displayOrder.length; i++) {
-    const data = questionsData[displayOrder[i]];
-    if (!isShuffled && data.category !== lastCategory) {
-      lastCategory = data.category;
-      html += '<div class="section-divider">' + escapeHtml(data.category) + '</div>';
-    }
-    html += buildCard(i, data);
-  }
-  container.innerHTML = html;
-}
-
-function buildCard(idx, data) {
-  const hintText = data.stateSpecific
-    ? '<div class="hint-text">This answer depends on your state. Check your own answer.</div>'
-    : data.matchAny2
-    ? '<div class="hint-text">Name two. Separate with "and" or a comma.</div>'
-    : data.matchAny3
-    ? '<div class="hint-text">Name three. Separate with commas.</div>'
-    : '';
-
-  const allAnswers = getAllAcceptableDisplay(data);
-
-  return `
-    <div class="question-card" id="card-${idx}">
-      <div class="q-header">
-        <span class="q-number">${data.q}</span>
-        <span class="q-text">${escapeHtml(data.question)}</span>
-      </div>
-      ${hintText}
-      <div class="answer-row">
-        <input type="text" class="answer-input" id="input-${idx}"
-          placeholder="Type your answer..." autocomplete="off"
-          onkeydown="if(event.key==='Enter'){checkSingleQ(${idx})}">
-        <button class="btn-check" style="padding:8px 14px;font-size:0.85rem;" onclick="checkSingleQ(${idx})">Check</button>
-        <span class="feedback" id="feedback-${idx}"></span>
-      </div>
-      <div class="acceptable-answers" id="acceptable-${idx}">
-        <strong>Acceptable answers:</strong> ${allAnswers}
-      </div>
-    </div>`;
+  return 'incorrect';
 }
 
 function getAllAcceptableDisplay(data) {
-  let list = [];
+  var list = [];
   if (data.allAnswersDisplay) return data.allAnswersDisplay.join(' | ');
-  if (data.stateSpecific) return 'Depends on your state — check <a href="https://www.uscis.gov/citizenship" target="_blank">USCIS.gov</a>';
-  if (data.answers && data.answers.length > 0) {
-    list = list.concat(data.answers);
-  }
-  if (data.matchAny2) list = list.concat(data.matchAny2.map(a => a));
-  if (data.matchAny3) list = list.concat(data.matchAny3.map(a => a));
-  // Deduplicate and capitalize
-  const seen = new Set();
-  const unique = [];
-  for (const item of list) {
-    const n = normalize(item);
-    if (!seen.has(n)) {
-      seen.add(n);
-      unique.push(item.replace(/\b\w/g, c => c.toUpperCase()));
+  if (data.stateSpecific) return 'Depends on your state';
+  if (data.answers && data.answers.length > 0) list = list.concat(data.answers);
+  if (data.matchAny2) list = list.concat(data.matchAny2);
+  if (data.matchAny3) list = list.concat(data.matchAny3);
+  var seen = {};
+  var unique = [];
+  for (var i = 0; i < list.length; i++) {
+    var n = normalize(list[i]);
+    if (!seen[n]) {
+      seen[n] = true;
+      unique.push(list[i].replace(/\b\w/g, function(c) { return c.toUpperCase(); }));
     }
   }
   return unique.join(' | ');
 }
 
 function escapeHtml(str) {
-  const div = document.createElement('div');
+  var div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
 }
 
-function checkSingleQ(idx) {
-  checkAnswer(idx);
+// ==================== ALL QUESTIONS MODE ====================
+
+function renderAllQuestions() {
+  var container = document.getElementById('quizContainer');
+  var html = '';
+  var lastCategory = '';
+  for (var i = 0; i < displayOrder.length; i++) {
+    var data = questionsData[displayOrder[i]];
+    if (!isShuffled && data.category !== lastCategory) {
+      lastCategory = data.category;
+      html += '<div class="section-divider">' + escapeHtml(data.category) + '</div>';
+    }
+    var hint = '';
+    if (data.stateSpecific) hint = '<div class="hint-text">This answer depends on your state. Check your own answer.</div>';
+    else if (data.matchAny2) hint = '<div class="hint-text">Name two. Separate with "and" or a comma.</div>';
+    else if (data.matchAny3) hint = '<div class="hint-text">Name three. Separate with commas.</div>';
+
+    html += '<div class="question-card" data-idx="' + i + '" data-qidx="' + displayOrder[i] + '">' +
+      '<div class="q-header"><span class="q-number">' + data.q + '</span><span class="q-text">' + escapeHtml(data.question) + '</span></div>' +
+      hint +
+      '<div class="answer-row">' +
+      '<input type="text" class="answer-input" placeholder="Type your answer..." autocomplete="off" onkeydown="if(event.key===\'Enter\')checkFromInput(this)">' +
+      '<button class="btn-check" style="padding:8px 14px;font-size:0.85rem;" onclick="checkFromButton(this)">Check</button>' +
+      '<span class="feedback"></span>' +
+      '</div>' +
+      '<div class="acceptable-answers"><strong>Acceptable answers:</strong> ' + getAllAcceptableDisplay(data) + '</div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function checkFromInput(inputEl) {
+  var card = inputEl.closest('.question-card');
+  applyResult(card);
+}
+
+function checkFromButton(btnEl) {
+  var card = btnEl.closest('.question-card');
+  applyResult(card);
+}
+
+function applyResult(card) {
+  var qidx = parseInt(card.getAttribute('data-qidx'));
+  var input = card.querySelector('.answer-input');
+  var feedback = card.querySelector('.feedback');
+  var acceptable = card.querySelector('.acceptable-answers');
+  var result = gradeAnswer(qidx, input.value);
+
+  if (result === 'empty') {
+    feedback.className = 'feedback show skipped-fb';
+    feedback.textContent = 'SKIPPED';
+    card.className = 'question-card skipped-card';
+    acceptable.classList.add('show');
+  } else if (result === 'state') {
+    feedback.className = 'feedback show skipped-fb';
+    feedback.textContent = 'SELF-CHECK';
+    card.className = 'question-card skipped-card';
+    acceptable.classList.add('show');
+  } else if (result === 'correct') {
+    feedback.className = 'feedback show correct-fb';
+    feedback.textContent = 'CORRECT';
+    input.className = 'answer-input input-correct';
+    card.className = 'question-card correct-card';
+  } else {
+    feedback.className = 'feedback show incorrect-fb';
+    feedback.textContent = 'INCORRECT';
+    input.className = 'answer-input input-incorrect';
+    card.className = 'question-card incorrect-card';
+    acceptable.classList.add('show');
+  }
+
+  results[qidx] = result;
   updateScore();
 }
 
 function checkAll() {
-  for (let i = 0; i < displayOrder.length; i++) {
-    checkAnswer(i);
+  var cards = document.querySelectorAll('#quizContainer .question-card');
+  for (var i = 0; i < cards.length; i++) {
+    applyResult(cards[i]);
   }
-  updateScore();
+}
+
+// ==================== SINGLE QUESTION MODE ====================
+
+function renderSingleQuestion() {
+  var dataIndex = displayOrder[currentIndex];
+  var data = questionsData[dataIndex];
+  var container = document.getElementById('singleCard');
+
+  var hint = '';
+  if (data.stateSpecific) hint = '<div class="hint-text">This answer depends on your state. Check your own answer.</div>';
+  else if (data.matchAny2) hint = '<div class="hint-text">Name two. Separate with "and" or a comma.</div>';
+  else if (data.matchAny3) hint = '<div class="hint-text">Name three. Separate with commas.</div>';
+
+  container.innerHTML =
+    '<div class="question-card" data-qidx="' + dataIndex + '">' +
+    '<div class="q-header"><span class="q-number">' + data.q + '</span><span class="q-text">' + escapeHtml(data.question) + '</span></div>' +
+    hint +
+    '<div class="answer-row">' +
+    '<input type="text" class="answer-input" id="singleInput" placeholder="Type your answer..." autocomplete="off" onkeydown="if(event.key===\'Enter\')checkSingle()">' +
+    '<span class="feedback" id="singleFeedback"></span>' +
+    '</div>' +
+    '<div class="acceptable-answers" id="singleAcceptable"><strong>Acceptable answers:</strong> ' + getAllAcceptableDisplay(data) + '</div>' +
+    '</div>';
+
+  document.getElementById('prevBtn').disabled = currentIndex === 0;
+  document.getElementById('nextBtn').disabled = currentIndex === displayOrder.length - 1;
+  document.getElementById('singleProgress').textContent = 'Question ' + (currentIndex + 1) + ' of ' + displayOrder.length;
+
+  setTimeout(function() {
+    var inp = document.getElementById('singleInput');
+    if (inp) inp.focus();
+  }, 100);
 }
 
 function checkSingle() {
-  checkAnswer(currentIndex);
-  updateScore();
-}
+  var card = document.querySelector('#singleCard .question-card');
+  if (!card) return;
+  var qidx = parseInt(card.getAttribute('data-qidx'));
+  var input = document.getElementById('singleInput');
+  var feedback = document.getElementById('singleFeedback');
+  var acceptable = document.getElementById('singleAcceptable');
+  if (!input || !feedback || !acceptable) return;
 
-function updateScore() {
-  let correct = 0, incorrect = 0, total = 0;
-  for (let i = 0; i < displayOrder.length; i++) {
-    const fb = document.getElementById('feedback-' + i);
-    if (fb && fb.classList.contains('show')) {
-      if (fb.classList.contains('correct-fb')) { correct++; total++; }
-      else if (fb.classList.contains('incorrect-fb')) { incorrect++; total++; }
-      else { total++; }
-    }
-  }
-  document.getElementById('scoreCorrect').textContent = correct;
-  document.getElementById('scoreIncorrect').textContent = incorrect;
-  document.getElementById('scoreTotal').textContent = total;
-  const pct = (total / displayOrder.length) * 100;
-  document.getElementById('progressBar').style.width = pct + '%';
-}
+  var result = gradeAnswer(qidx, input.value);
 
-function resetAll() {
-  for (let i = 0; i < displayOrder.length; i++) {
-    const input = document.getElementById('input-' + i);
-    const feedback = document.getElementById('feedback-' + i);
-    const card = document.getElementById('card-' + i);
-    const acceptable = document.getElementById('acceptable-' + i);
-    if (input) { input.value = ''; input.className = 'answer-input'; }
-    if (feedback) { feedback.className = 'feedback'; feedback.textContent = ''; }
-    if (card) card.className = 'question-card';
-    if (acceptable) acceptable.classList.remove('show');
-  }
-  document.getElementById('scoreCorrect').textContent = '0';
-  document.getElementById('scoreIncorrect').textContent = '0';
-  document.getElementById('scoreTotal').textContent = '0';
-  document.getElementById('progressBar').style.width = '0%';
-}
-
-function toggleMode() {
-  singleModeActive = !singleModeActive;
-  const btn = document.getElementById('modeBtn');
-  const allContainer = document.getElementById('quizContainer');
-  const singleContainer = document.getElementById('singleMode');
-
-  if (singleModeActive) {
-    btn.textContent = 'All Questions Mode';
-    allContainer.classList.add('hidden');
-    allContainer.innerHTML = '';
-    singleContainer.classList.add('active');
-    currentIndex = 0;
-    renderSingleQuestion();
+  if (result === 'empty') {
+    feedback.className = 'feedback show skipped-fb';
+    feedback.textContent = 'SKIPPED';
+    card.className = 'question-card skipped-card';
+    acceptable.classList.add('show');
+  } else if (result === 'state') {
+    feedback.className = 'feedback show skipped-fb';
+    feedback.textContent = 'SELF-CHECK';
+    card.className = 'question-card skipped-card';
+    acceptable.classList.add('show');
+  } else if (result === 'correct') {
+    feedback.className = 'feedback show correct-fb';
+    feedback.textContent = 'CORRECT';
+    input.className = 'answer-input input-correct';
+    card.className = 'question-card correct-card';
   } else {
-    btn.textContent = 'Single Question Mode';
-    singleContainer.classList.remove('active');
-    singleContainer.querySelector('#singleCard').innerHTML = '';
-    allContainer.classList.remove('hidden');
-    renderAllQuestions();
+    feedback.className = 'feedback show incorrect-fb';
+    feedback.textContent = 'INCORRECT';
+    input.className = 'answer-input input-incorrect';
+    card.className = 'question-card incorrect-card';
+    acceptable.classList.add('show');
   }
-}
 
-function renderSingleQuestion() {
-  const data = questionsData[displayOrder[currentIndex]];
-  const card = document.getElementById('singleCard');
-  card.innerHTML = buildCard(currentIndex, data);
-  document.getElementById('prevBtn').disabled = currentIndex === 0;
-  document.getElementById('nextBtn').disabled = currentIndex === displayOrder.length - 1;
-  document.getElementById('singleProgress').textContent =
-    `Question ${currentIndex + 1} of ${displayOrder.length}`;
-  setTimeout(() => {
-    const input = document.getElementById('input-' + currentIndex);
-    if (input) input.focus();
-  }, 100);
+  results[qidx] = result;
+  updateScore();
 }
 
 function nextQuestion() {
@@ -647,13 +583,25 @@ function prevQuestion() {
   }
 }
 
-function shuffleQuestions() {
-  isShuffled = true;
-  for (let i = displayOrder.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [displayOrder[i], displayOrder[j]] = [displayOrder[j], displayOrder[i]];
+// ==================== SHARED ====================
+
+function updateScore() {
+  var correct = 0, incorrect = 0, total = 0;
+  for (var key in results) {
+    total++;
+    if (results[key] === 'correct') correct++;
+    else if (results[key] === 'incorrect') incorrect++;
   }
-  resetAll();
+  document.getElementById('scoreCorrect').textContent = correct;
+  document.getElementById('scoreIncorrect').textContent = incorrect;
+  document.getElementById('scoreTotal').textContent = total;
+  var pct = (total / displayOrder.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function resetAll() {
+  results = {};
+  updateScore();
   if (singleModeActive) {
     currentIndex = 0;
     renderSingleQuestion();
@@ -662,16 +610,50 @@ function shuffleQuestions() {
   }
 }
 
-function resetOrder() {
-  isShuffled = false;
-  displayOrder = questionsData.map((_, i) => i);
-  resetAll();
+function toggleMode() {
+  singleModeActive = !singleModeActive;
+  var btn = document.getElementById('modeBtn');
+  var allContainer = document.getElementById('quizContainer');
+  var singleContainer = document.getElementById('singleMode');
+  var checkAllBtn = document.getElementById('checkAllBtn');
+
   if (singleModeActive) {
+    btn.textContent = 'All Questions Mode';
+    allContainer.classList.add('hidden');
+    allContainer.innerHTML = '';
+    singleContainer.classList.add('active');
+    checkAllBtn.style.display = 'none';
     currentIndex = 0;
+    results = {};
+    updateScore();
     renderSingleQuestion();
   } else {
+    btn.textContent = 'Single Question Mode';
+    singleContainer.classList.remove('active');
+    document.getElementById('singleCard').innerHTML = '';
+    allContainer.classList.remove('hidden');
+    checkAllBtn.style.display = '';
+    results = {};
+    updateScore();
     renderAllQuestions();
   }
+}
+
+function shuffleQuestions() {
+  isShuffled = true;
+  for (var i = displayOrder.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = displayOrder[i];
+    displayOrder[i] = displayOrder[j];
+    displayOrder[j] = tmp;
+  }
+  resetAll();
+}
+
+function resetOrder() {
+  isShuffled = false;
+  displayOrder = questionsData.map(function(_, i) { return i; });
+  resetAll();
 }
 
 // Initialize
