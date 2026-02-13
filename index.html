@@ -380,6 +380,7 @@ function checkAnswer(qIndex) {
   const feedback = document.getElementById('feedback-' + qIndex);
   const card = document.getElementById('card-' + qIndex);
   const acceptable = document.getElementById('acceptable-' + qIndex);
+  if (!input || !feedback || !card || !acceptable || !data) return 'skipped';
   const userAnswer = normalize(input.value);
 
   if (!userAnswer) {
@@ -507,7 +508,8 @@ function buildCard(idx, data) {
       <div class="answer-row">
         <input type="text" class="answer-input" id="input-${idx}"
           placeholder="Type your answer..." autocomplete="off"
-          onkeydown="if(event.key==='Enter'){${singleModeActive ? 'checkSingle()' : `checkSingleQ(${idx})`}}">
+          onkeydown="if(event.key==='Enter'){checkSingleQ(${idx})}">
+        <button class="btn-check" style="padding:8px 14px;font-size:0.85rem;" onclick="checkSingleQ(${idx})">Check</button>
         <span class="feedback" id="feedback-${idx}"></span>
       </div>
       <div class="acceptable-answers" id="acceptable-${idx}">
