@@ -606,13 +606,15 @@ function toggleMode() {
   if (singleModeActive) {
     btn.textContent = 'All Questions Mode';
     allContainer.classList.add('hidden');
+    allContainer.innerHTML = '';
     singleContainer.classList.add('active');
     currentIndex = 0;
     renderSingleQuestion();
   } else {
     btn.textContent = 'Single Question Mode';
-    allContainer.classList.remove('hidden');
     singleContainer.classList.remove('active');
+    singleContainer.querySelector('#singleCard').innerHTML = '';
+    allContainer.classList.remove('hidden');
     renderAllQuestions();
   }
 }
